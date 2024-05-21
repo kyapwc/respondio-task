@@ -1,9 +1,17 @@
 # Respond.io Assessment
 
+## Table of content:
+- [Task 1](#facebook-messenger-bot)
+- [Task 2](#clean-and-sort-transactions)
+- [Task 3](#how-to-solve-high-volume-write-operations)
+
+
 The tasks' requirements are stated here: [Task Assessment](https://drive.google.com/file/d/1lIf-25aQ1-s2BtJegcPVcWfpPw0M3aF0/view?usp=sharing)
 
 Below is just general notes on thought process for the accessment tasks
 
+
+<a id="facebook-messenger-bot"></a>
 ## Task 1: Facebook Messenger Bot
 ### Requirement
 1. Develop an application that connects with a Facebook Page.
@@ -67,6 +75,7 @@ Why did I use MailerSend instead of SendGrid?
 Why is my eslint config so basic?
 - Decided for simple config as its a small project and not needed for full-scale linter
 
+<a id="clean-and-sort-transactions"></a>
 ## Task 2: Clean & Sort Transactions
 ### Requirement
 1. Find all transactions that have the same `sourceAccount`, `targetAccount`, `category`, `amount`
@@ -100,6 +109,7 @@ This is used to check initial duplication first before we further check the `tra
 
 Store the results in an map with type of: `Record<string, array>` and during the return, we can just do a simple `Object.values(duplicatesMap)`
 
+<a id="how-to-solve-high-volume-write-operations"></a>
 ## Task 3: How to solve the high volume of write operations in RDS MySQL databases?
 > Note: My background is mainly lies in the logistics industry so the examples I provide is mostly from logistics standpoint and can differ slightly
 
