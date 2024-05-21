@@ -12,7 +12,7 @@ const redisClient = require('../services/redis')
  * @param {string} senderId
  * @returns {Promise<boolean>} a boolean value, whether to continue the respond to user or not
  */
-const shouldPromptFirstTimeResponse = async (senderId) => {
+const shouldGreetUser = async (senderId) => {
   const existing = await redisClient.get(senderId)
 
   if (Number(existing) >= 1) {
@@ -49,23 +49,68 @@ const generateGreeting = () => {
   return greetings[index]
 }
 
+const getProduct = async (productId) => {
+  const product = await redisClient.get(String(productId))
+
+  if (!product) return null
+
+  return JSON.parse(product)
+}
+
+const getProductFromList = async (productId) => {
+  const productsJSON = await redisClient.get('page_products')
+  if (!productsJSON) return null
+
+  const products = JSON.parse(productsJSON)
+
+  const product = await products.find((product) => product.sku === Number(productId))
+  if (!product) return null
+
+  return product
+}
+
 /**
  * Used to handle facebook webhook events that come in
  * @param {string} senderId
  * @param {{ text: string; }} message
  */
 module.exports.handleWebhookMessage = async (senderId, message) => {
-  let response = {}
+  if (!message.text) return
+
+  const shouldGreet = await shouldGreetUser(senderId)
 
   // we don't have to care about the initial hi/hello/good morning since the doc stated:
   // WHEN THE CONTACT SENDS A MESSAGE FOR THE FIRST TIME
-  if (message.text) {
-    response = { text: generateGreeting() }
+  if (shouldGreet) {
+    this.sendMessageResponse(senderId, { text: generateGreeting })
   }
 
-  const shouldRespond = await shouldPromptFirstTimeResponse(senderId)
+  // if text includes `/desc`, `/price`, `/shipping` then do below
+  const queryPrefixMethods = {
+    '/desc': 'Description',
+    '/price': 'Price',
+    '/shipping': 'Shipping',
+  }
+  const [messagePrefix, productId] = message.text.split(' ')
 
-  if (shouldRespond) this.sendMessageResponse(senderId, response)
+  if (Object.keys(queryPrefixMethods).includes(messagePrefix)) {
+    const product = await getProduct(productId)
+    // below just slower compared to direct key-value map
+    // const product = await getProductFromList(productId)
+
+    const productParameter = queryPrefixMethods[messagePrefix]
+
+    if (!product) return
+
+    let responseText = `
+Product SKU: ${productId}
+Product Name: ${product.name}
+`
+
+    responseText += `${productParameter}: ${product?.[productParameter.toLowerCase()]}`
+
+    this.sendMessageResponse(senderId, { text: responseText })
+  }
 }
 
 /**
@@ -74,10 +119,16 @@ module.exports.handleWebhookMessage = async (senderId, message) => {
  * @param {object} response
  */
 module.exports.sendMessageResponse = async (senderId, response) => {
+  // will just use simple message without meta template messages
+  // due to having to backpack on either facebook urls or facebook attachment upload api which is inconvenient
+  // https://developers.facebook.com/docs/messenger-platform/send-messages/template/media
+  // and the generic template has 80 character limit on subtitle which is not ideal
+  // https://developers.facebook.com/docs/messenger-platform/reference/templates/generic
   const body = {
     recipient: { id: senderId },
     message: response,
   }
+
   console.log(`Messsage: ${JSON.stringify(body)} is being sent back to user ${senderId}`)
 
   try {
