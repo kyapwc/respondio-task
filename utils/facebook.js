@@ -95,7 +95,7 @@ const getProductFromList = async (productId) => {
  */
 const handleFBQuery = async (product, productParam, senderId, productId) => {
   if (!product) {
-    await this.sendMessageResponse(senderId, { text: `Product ${productId} does not exist`})
+    await sendMessageResponse(senderId, { text: `Product ${productId} does not exist`})
     return
   }
 
@@ -106,7 +106,9 @@ Product Name: ${product.name}
 
   responseText += `${productParam}: ${product?.[productParam.toLowerCase()]}`
 
-  await this.sendMessageResponse(senderId, { text: responseText })
+  await sendMessageResponse(senderId, { text: responseText })
+
+  return responseText
 }
 
 /**
@@ -151,14 +153,14 @@ const handleFBPurchaseNotification = async (product) => {
  * @param {string} senderId
  * @param {{ text: string; }} message
  */
-module.exports.handleWebhookMessage = async (senderId, message) => {
+const handleWebhookMessage = async (senderId, message) => {
   if (!message.text) return
 
   const shouldGreet = await shouldGreetUser(senderId)
 
   // we don't have to care about the initial hi/hello/good morning since the doc stated:
   // WHEN THE CONTACT SENDS A MESSAGE FOR THE FIRST TIME
-  if (shouldGreet) this.sendMessageResponse(senderId, { text: generateGreeting })
+  if (shouldGreet) sendMessageResponse(senderId, { text: generateGreeting })
 
   // if text includes `/desc`, `/price`, `/shipping` then do below
   const [messagePrefix, productId] = message.text.split(' ')
@@ -192,7 +194,7 @@ module.exports.handleWebhookMessage = async (senderId, message) => {
  * @param {string} senderId
  * @param {object} response
  */
-module.exports.sendMessageResponse = async (senderId, response) => {
+const sendMessageResponse = async (senderId, response) => {
   // will just use simple message without meta template messages
   // due to having to backpack on either facebook urls or facebook attachment upload api which is inconvenient
   // https://developers.facebook.com/docs/messenger-platform/send-messages/template/media
@@ -220,4 +222,13 @@ module.exports.sendMessageResponse = async (senderId, response) => {
 
     console.log('Failed to send message, with error: ', error)
   }
+}
+
+module.exports = {
+  sendMessageResponse,
+  handleWebhookMessage,
+  shouldGreetUser,
+  getProduct,
+  handleFBQuery,
+  handleFBPurchaseNotification,
 }
