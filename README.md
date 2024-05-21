@@ -82,6 +82,9 @@ Why did I use MailerSend instead of SendGrid?
 Why is my eslint config so basic?
 - Decided for simple config as its a small project and not needed for full-scale linter
 
+Why did I use the `product.sku` as the `product-id`?
+- In warehousing, generally products are categorised or sorted based on this `SKU`, so I went with this approach.
+
 <a id="clean-and-sort-transactions"></a>
 ## Task 2: Clean & Sort Transactions
 ### Requirement
