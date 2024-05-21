@@ -62,7 +62,7 @@ Why did I use MailerSend instead of SendGrid?
     - So, I decided to forget password, which requires the sendgrid `username` which I cannot get yet due to the failed signup via Google SSO
     - Reporting this issue and reaching out to sendgrid will take up too much time, so I opted for MailerSend for simplicity sake
 - Reference Image below:
-    - ![Sendgrid Google SSO Failed Authentication](https://raw.githubusercontent.com/kyapwc/respondio-task/master/assets/sendgrid_failed_login.png)
+    - ![Sendgrid Google SSO Failed Authentication](https://raw.githubusercontent.com/kyapwc/respondio-task/master/assets/sendgrid_fail_login.png)
 
 Why is my eslint config so basic?
 - Decided for simple config as its a small project and not needed for full-scale linter
