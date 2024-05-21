@@ -6,7 +6,7 @@ require('dotenv').config()
 require('./services/redis')
 require('./services/mailersend')
 
-const { PORT, VERIFY_TOKEN } = require('./config')
+const { VERIFY_TOKEN } = require('./config')
 const { handleWebhookMessage } = require("./utils/facebook")
 
 const app = express()
