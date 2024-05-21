@@ -50,6 +50,13 @@ const generateGreeting = () => {
   return greetings[index]
 }
 
+/**
+ * Method to get product from redis
+ *
+ * @returns {object} a product from products.json
+ *
+ * @see "./assets/products.json"
+ */
 const getProduct = async (productId) => {
   const product = await redisClient.get(String(productId))
 
@@ -58,6 +65,13 @@ const getProduct = async (productId) => {
   return JSON.parse(product)
 }
 
+/**
+ * Just an example function of using filtering through array to find product
+ *
+ * @returns {object} a product from products.json
+ *
+ * @see "./assets/products.json"
+ */
 const getProductFromList = async (productId) => {
   const productsJSON = await redisClient.get('page_products')
   if (!productsJSON) return null
@@ -70,6 +84,15 @@ const getProductFromList = async (productId) => {
   return product
 }
 
+/**
+ * A handler for the FB Queries such as `/desc`, `/shipping` or `/price`
+ * it will send a FB message respond on behalf of the page to the user
+ *
+ * @param {object} product
+ * @param {string} productParam
+ * @param {string} senderId
+ * @param {string} productId
+ */
 const handleFBQuery = async (product, productParam, senderId, productId) => {
   if (!product) {
     await this.sendMessageResponse(senderId, { text: `Product ${productId} does not exist`})
@@ -86,6 +109,12 @@ Product Name: ${product.name}
   await this.sendMessageResponse(senderId, { text: responseText })
 }
 
+/**
+ * A handler for the FB `/buy` commands
+ * it will send an email to the page owner to prepare items for user purchase
+ *
+ * @param {object} product
+ */
 const handleFBPurchaseNotification = async (product) => {
   if (!product) {
     console.log('No product found, therefore email notification is skipped')
