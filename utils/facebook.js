@@ -3,6 +3,7 @@ const axios = require('axios')
 const { PAGE_ACCESS_TOKEN, FB_PAGE_ID } = require('../config')
 
 const redisClient = require('../services/redis')
+const mailersendClient = require('../services/mailersend')
 
 /**
  * Function to decide if the first time greeting should be responded back to user
@@ -69,6 +70,53 @@ const getProductFromList = async (productId) => {
   return product
 }
 
+const handleFBQuery = async (product, productParam, senderId, productId) => {
+  if (!product) {
+    await this.sendMessageResponse(senderId, { text: `Product ${productId} does not exist`})
+    return
+  }
+
+  let responseText = `
+Product SKU: ${product.sku}
+Product Name: ${product.name}
+`
+
+  responseText += `${productParam}: ${product?.[productParam.toLowerCase()]}`
+
+  await this.sendMessageResponse(senderId, { text: responseText })
+}
+
+const handleFBPurchaseNotification = async (product) => {
+  if (!product) {
+    console.log('No product found, therefore email notification is skipped')
+    return
+  }
+
+  await mailersendClient.sendEmail({
+    // recipient should be us (the company)
+    recipient: {
+      email: 'kyapwc@gmail.com',
+      name: 'Facebook Messenger Custom Notification',
+    },
+    subject: 'Facebook Purchase Order Requested',
+    content: `
+<html>
+  <body>
+    <p>A user on Facebook has requested the purchase of <b>${product.name}</b> with the below details: </p>
+    <img style="padding-left: 40px;" src="${product.image}" alt="${product.name}" />
+    <ul>
+      <li>Product SKU: ${product.sku}</li>
+      <li>Product Name: ${product.name}</li>
+      <li>Product Price: $${product.price}</li>
+      <li>Product Shipping Fee: $${product.shipping}</li>
+    </ul>
+    <p>Please ensure to prepare the products on time and check your Facebook Page for related contact information.</p>
+  </body>
+</html>
+`,
+  })
+}
+
 /**
  * Used to handle facebook webhook events that come in
  * @param {string} senderId
@@ -84,31 +132,30 @@ module.exports.handleWebhookMessage = async (senderId, message) => {
   if (shouldGreet) this.sendMessageResponse(senderId, { text: generateGreeting })
 
   // if text includes `/desc`, `/price`, `/shipping` then do below
-  const queryPrefixMethods = {
-    '/desc': 'Description',
-    '/price': 'Price',
-    '/shipping': 'Shipping',
-  }
   const [messagePrefix, productId] = message.text.split(' ')
 
-  if (Object.keys(queryPrefixMethods).includes(messagePrefix)) {
-    const product = await getProduct(productId)
-    // below just slower compared to direct key-value map
-    // const product = await getProductFromList(productId)
-
-    const productParameter = queryPrefixMethods[messagePrefix]
-
-    if (!product) return
-
-    let responseText = `
-Product SKU: ${productId}
-Product Name: ${product.name}
-`
-
-    responseText += `${productParameter}: ${product?.[productParameter.toLowerCase()]}`
-
-    this.sendMessageResponse(senderId, { text: responseText })
+  const queryPrefixMethods = {
+    '/desc': { action: handleFBQuery, productParam: 'Description' },
+    '/price': { action: handleFBQuery, productParam: 'Description' },
+    '/shipping': { action: handleFBQuery, productParam: 'Description' },
+    '/buy': { action: handleFBPurchaseNotification },
   }
+
+  const handler = queryPrefixMethods[messagePrefix]
+  // if no handler found, immediately return
+  if (!handler) return
+
+  const product = await getProduct(productId)
+  // const product = await getProductFromList(productId)
+  // can also opt for local map / local array using:
+  // const products = require('../assets/products.json').reduce((acc, curr) => {
+  //  acc[curr.sku] = curr
+  //  return acc
+  // })
+  // const products = require('../assets/products.json')
+  // opted to store everything on redis since the requirement stated to have a database technology to be involved
+
+  await handler.action(product, handler?.productParam, senderId, productId)
 }
 
 /**
