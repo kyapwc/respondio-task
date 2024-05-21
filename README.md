@@ -8,7 +8,9 @@
 
 The tasks' requirements are stated here: [Task Assessment](https://drive.google.com/file/d/1lIf-25aQ1-s2BtJegcPVcWfpPw0M3aF0/view?usp=sharing)
 
-Below is just general notes on thought process for the accessment tasks
+Below is just my individual thought process for the accessment tasks while answering it.
+
+Furthermore, the answer for [Task 3](#how-to-solve-high-volume-write-operations) is also included at the bottom.
 
 
 <a id="facebook-messenger-bot"></a>
