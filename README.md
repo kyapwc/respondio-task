@@ -119,14 +119,14 @@ I think this subject is quite broad in itself as there are alot of factors that 
 2. If possible to normalise the existing tables for not-so-important columns, please do so, an example is:
     - An example table:
         ```
-        Orders table (id, merchantName, merchantPhone, itemName, itemLength, itemWidth, itemHeight, pickupTime, dropoffTime, pickupAddress, pickupLatitude, pickupLongitude, dropoffAddress, dropoffLatitude, dropoffLongitude)
+        Orders table (id, merchantName, merchantPhone, itemName, itemLength, itemWidth, itemHeight, pickupTime, dropoffTime, pickupAddress, pickupLatitude, pickupLongitude, dropoffAddress, dropoffLatitude, dropoffLongitude, city, status)
         ```
     - We can normalise it to:
         ```
         Merchant(id, name, phone, createdAt, updatedAt)
         Item(id, orderId, name, length, width, height) // many to 1 with Order table
         Waypoint(id, time, address, latitude, longitude, orderId) // many to 1 with Order table
-        Order(id, merchantId)
+        Order(id, merchantId, city, status)
         ```
     - By doing the above, we can significantly reduce the writes that occur on a singular table and it helps by reducing the need to update a table with more columns and makes the writes more *focused*
     - Furthermore, the sql transaction size is much smaller as it is spread across multiple tables
