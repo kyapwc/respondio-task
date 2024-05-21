@@ -3,7 +3,8 @@ const bodyParser = require('body-parser')
 
 require('dotenv').config()
 // require to init redis service
-require('./services/redis')
+const redisClient = require('./services/redis')
+require('./services/mailersend')
 
 const { PORT, VERIFY_TOKEN } = require('./config')
 const { handleWebhookMessage } = require("./utils/facebook")
@@ -64,6 +65,14 @@ app.post('/webhook', (req, res) => {
 })
 
 // setup listener on $PORT
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`App listening on port: ${PORT}`)
+})
+
+process.on('SIGINT', () => {
+  console.log('SIGINT signal received, closing HTTP server and removing connection to redis')
+
+  server.close(() => {
+    redisClient.quit()
+  })
 })
