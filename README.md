@@ -48,7 +48,7 @@ Furthermore, the answer for [Task 3](#how-to-solve-high-volume-write-operations)
     /buy 346575
     ```
 9. FB Page should respond back to user with details / the purchase order email will be sent to `kyapwc@gmail.com`, please update the `handleFBPurchaseNotification` method to your own email
-    - this part is abit confusing and I am not sure if I did it correctly as the assesment documentation states:
+    - this part is abit confusing and I am not sure if I did it correctly as the assessment documentation states:
         - If customer says `/buy product-xyz`, **you** should receive email with the full product description. i.e: name, price, shipping fee, so that you can process the order for the customer
         - From the above statement, I think it means I (not the user) should receive the email to process the order
 
@@ -60,7 +60,7 @@ npm run test
 ```
 
 ### The `/buy` handler
-Below is an image example of what gets send to `me` when `/buy product-xyz` is sent through FB Messenger page
+Below is an image example of what gets sent to `me` when `/buy product-xyz` is sent through FB Messenger page
 
 ![Mailersend Content](https://raw.githubusercontent.com/kyapwc/respondio-task/master/assets/mailersend_content.png)
 
