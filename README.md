@@ -59,6 +59,11 @@ Using Jest & supertest to mock express server.
 npm run test
 ```
 
+### The `/buy` handler
+Below is an image example of what gets send to `me` when `/buy product-xyz` is sent through FB Messenger page
+
+![Mailersend Content](https://raw.githubusercontent.com/kyapwc/respondio-task/master/assets/mailersend_content.png)
+
 ### Reasonings
 Why did I use Redis?
 - It is a simple key-value pair database which fits the requirement and ease-of-use
