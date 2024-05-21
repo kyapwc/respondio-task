@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 
 require('dotenv').config()
 // require to init redis service
-const redisClient = require('./services/redis')
+require('./services/redis')
 require('./services/mailersend')
 
 const { PORT, VERIFY_TOKEN } = require('./config')

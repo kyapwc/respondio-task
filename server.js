@@ -1,5 +1,6 @@
 const app = require('./app')
 const { PORT } = require('./config')
+const redisClient = require('./services/redis')
 
 // setup listener on $PORT
 const server = app.listen(PORT, () => {
