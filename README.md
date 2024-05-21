@@ -99,3 +99,28 @@ Loop through the sorted `transactions` array and specify a `key` that is a combi
 This is used to check initial duplication first before we further check the `transaction.time` against previously traversed transaction time.
 
 Store the results in an map with type of: `Record<string, array>` and during the return, we can just do a simple `Object.values(duplicatesMap)`
+
+## Task 3: How to solve the high volume of write operations in RDS MySQL databases?
+> Note: My background is mainly lies in the logistics industry so the examples I provide is mostly from logistics standpoint and can differ slightly
+
+I think this subject is quite broad in itself as there are alot of factors that can affect this aspect. What I can think of are:
+
+1. Ensure the indexes you currently have in your database does not significantly affect your WRITE operations as too many indexes can improve the read speed but also affect the write speed
+2. If possible to normalise the existing tables for not-so-important columns, please do so, an example is:
+    - Orders table (id, merchantName, merchantPhone, itemName, itemLength, itemWidth, itemHeight, pickupTime, dropoffTime, pickupAddress, pickupLatitude, pickupLongitude, dropoffAddress, dropoffLatitude, dropoffLongitude)
+    - We can normalise it to:
+        ```
+        Merchant(id, name, phone, createdAt, updatedAt)
+        Item(id, orderId, name, length, width, height) // many to 1 with Order table
+        Waypoint(id, time, address, latitude, longitude, orderId) // many to 1 with Order table
+        Order(id, merchantId)
+        ```
+    - By doing the above, we can significantly reduce the writes that occur on a singular table and it helps in reducing the need to update less data
+    - Furthermore, the sql transaction size is much smaller as it is spread across multiple tables
+    - However, please do not normalise the database tables too much as it can lead to alot of issues, especially in the context of `EAV-patterned` tables which significantly reduces the `read` operations depending on context.
+3. Batch inserts / updates instead of doing the writes one at a time. This can effectively reduce the amount of write into a single batch query.
+4. Simplest way is to regularly check RDS performance insight to check which `WRITE` operations cost the most and which ones block the other operations the most. From that analysis, just fix the query using `EXPLAIN ANALYZE`.
+5. If you are using an ORM (like prisma / sequelize), make sure to understand what queries are being written under the hood and how those ORMs are communicating with the database, sometimes it is safer to write raw queries to facilitate better write speeds
+6. Use of more optimal storage types (not the most cost-effective strategy and should be used as last resort, depending on business requirements)
+7. Use of `READ` replicas for all the reading that is required in your application and only reserve the MASTER/PRIMARY RDS instance for write operations
+    - There can be a small delay between write / read instances (maybe few milliseconds) and the ORM you use should be able to provide a way to force the query to use the MASTER/PRIMARY instance
