@@ -5,8 +5,8 @@ const {
   REDIS_PORT,
   REDIS_PASSWORD,
 } = require('../config')
-
 const { waitFor } = require('../utils')
+const products = require('../assets/products.json')
 
 /**
  * Redis class for initialising redis instance and ensuring the reconnection in case of any redis server errors
@@ -54,6 +54,7 @@ class Redis {
 
     this.client.on('ready', () => {
       console.log('Redis client connected successfully..')
+      this.seedDatabase()
     })
   }
 
@@ -68,6 +69,21 @@ class Redis {
     if (this.client) {
       this.client.quit()
     }
+  }
+
+  // 2 types of seed (1 is seed based on product.sku, other one is entire array into redis)
+  async seedDatabase() {
+    products.forEach((product) => {
+      // product.sku is the product's ID in a e-commerce context
+      // set into a map to be able to immediately GET the product
+      try {
+        this.client.set(String(product.sku), JSON.stringify(product))
+      } catch (error) {
+        console.log('error: ', error)
+      }
+    })
+
+    this.client.set('page_products', JSON.stringify(products))
   }
 }
 
