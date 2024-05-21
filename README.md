@@ -117,7 +117,10 @@ I think this subject is quite broad in itself as there are alot of factors that 
 
 1. Ensure the indexes you currently have in your database does not significantly affect your WRITE operations as too many indexes can improve the read speed but also affect the write speed
 2. If possible to normalise the existing tables for not-so-important columns, please do so, an example is:
-    - Orders table (id, merchantName, merchantPhone, itemName, itemLength, itemWidth, itemHeight, pickupTime, dropoffTime, pickupAddress, pickupLatitude, pickupLongitude, dropoffAddress, dropoffLatitude, dropoffLongitude)
+    - An example table:
+        ```
+        Orders table (id, merchantName, merchantPhone, itemName, itemLength, itemWidth, itemHeight, pickupTime, dropoffTime, pickupAddress, pickupLatitude, pickupLongitude, dropoffAddress, dropoffLatitude, dropoffLongitude)
+        ```
     - We can normalise it to:
         ```
         Merchant(id, name, phone, createdAt, updatedAt)
@@ -125,7 +128,7 @@ I think this subject is quite broad in itself as there are alot of factors that 
         Waypoint(id, time, address, latitude, longitude, orderId) // many to 1 with Order table
         Order(id, merchantId)
         ```
-    - By doing the above, we can significantly reduce the writes that occur on a singular table and it helps in reducing the need to update less data
+    - By doing the above, we can significantly reduce the writes that occur on a singular table and it helps by reducing the need to update a table with more columns and makes the writes more *focused*
     - Furthermore, the sql transaction size is much smaller as it is spread across multiple tables
     - However, please do not normalise the database tables too much as it can lead to alot of issues, especially in the context of `EAV-patterned` tables which significantly reduces the `read` operations depending on context.
 3. Batch inserts / updates instead of doing the writes one at a time. This can effectively reduce the amount of write into a single batch query.
