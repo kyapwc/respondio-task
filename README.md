@@ -62,7 +62,7 @@ npm run test
 ### Reasonings
 Why did I use Redis?
 - It is a simple key-value pair database which fits the requirement and ease-of-use
-- It will be unnecessary to install postgres/sql/mongo just for this simple application
+- It will be unnecessary to install postgres/sql/mongo to fetch or write small amounts of data
 - In fact, use of a hash table is much easier but I just want to adhere to the requirement of having to use a database for the solution
 
 Why did I use MailerSend instead of SendGrid?
