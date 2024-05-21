@@ -160,15 +160,15 @@ const handleWebhookMessage = async (senderId, message) => {
 
   // we don't have to care about the initial hi/hello/good morning since the doc stated:
   // WHEN THE CONTACT SENDS A MESSAGE FOR THE FIRST TIME
-  if (shouldGreet) sendMessageResponse(senderId, { text: generateGreeting })
+  if (shouldGreet) sendMessageResponse(senderId, { text: generateGreeting() })
 
   // if text includes `/desc`, `/price`, `/shipping` then do below
   const [messagePrefix, productId] = message.text.split(' ')
 
   const queryPrefixMethods = {
     '/desc': { action: handleFBQuery, productParam: 'Description' },
-    '/price': { action: handleFBQuery, productParam: 'Description' },
-    '/shipping': { action: handleFBQuery, productParam: 'Description' },
+    '/price': { action: handleFBQuery, productParam: 'Price' },
+    '/shipping': { action: handleFBQuery, productParam: 'Shipping' },
     '/buy': { action: handleFBPurchaseNotification },
   }
 
