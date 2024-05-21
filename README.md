@@ -20,9 +20,9 @@ Furthermore, the answer for [Task 3](#how-to-solve-high-volume-write-operations)
 2. Process incoming messages (webhooks) from the Facebook Page.
 
 ### Steps
-1. Create new Meta App using [Facebook Developers Apps Center](https://developers.facebook.com/apps/?show_reminder=true)
+1. <a id="fb-first-step"></a>Create new Meta App using [Facebook Developers Apps Center](https://developers.facebook.com/apps/?show_reminder=true)
 2. Create new Facebook Page for testing (can be some arbitrary one that can be deleted later on)
-3. Register Webhooks and Messenger `products` into the created app in [Step 1](#create-new-meta-app-using-facebook-developers-apps-center)
+3. Register Webhooks and Messenger `products` into the created app in [Step 1](#fb-first-step)
     - Webhooks product steps
         - After registering Webhooks product, make sure to subscribe to the `Page` subscription
         - Provide the webhook url via ngrok (`ngrok http http://localhost:${PORT}`)
