@@ -65,7 +65,7 @@ const findDuplicateTransactions = (transactions = []) => {
       return acc;
     }, {})
 
-  // sort transaction in ascending after to match output (only if initially sorted descending)
+  // sort transaction in ascending after (only if initially sorted descending)
   return Object.values(duplicatesMap).map((value) => {
     value.sort((a, b) => new Date(a.time) - new Date(b.time))
     return value
